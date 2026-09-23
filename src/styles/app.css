@@ -1,0 +1,12 @@
+/* Bổ sung cho bản React (không có trong prototype gốc) */
+a.navbtn{text-decoration:none}
+.modal-head button{border:0;background:transparent;font-size:16px;color:var(--muted)}
+.check{flex:none;display:grid;place-items:center;background:#fff;padding:0;font-size:12px;color:#fff}
+.check.done{background:var(--green);border-color:var(--green)}
+.task.done .task-main b{text-decoration:line-through;color:var(--muted)}
+.switch{border:0;cursor:pointer}
+.global-search .results{position:absolute;top:46px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;z-index:40}
+.global-search .results button{width:100%;display:flex;gap:9px;align-items:center;padding:9px 12px;border:0;background:#fff;text-align:left}
+.global-search .results button:hover{background:#fff7f1}
+.global-search .results small{display:block;color:var(--muted);font-size:11px}
+.muted-sm{display:block;color:#98a2b3}
