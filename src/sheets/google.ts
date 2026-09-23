@@ -93,6 +93,8 @@ export class GoogleApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    /** Cần đăng nhập lại: token hết hạn hoặc thiếu quyền */
+    public reauth = false,
   ) {
     super(message)
   }
@@ -108,12 +110,14 @@ async function gfetch<T>(url: string, token: string): Promise<T> {
       ? 'Phiên đăng nhập đã hết hạn.'
       : res.status === 403 && /has not been used|is disabled/i.test(detail)
         ? 'Google Sheets API chưa được bật trong Google Cloud project.'
-        : res.status === 403
+        : res.status === 403 && /insufficient.*scope/i.test(detail)
+          ? 'Bạn chưa cho phép xem Google Trang tính. Bấm Đăng nhập lại và tick ô "Xem bảng tính trên Google Trang tính".'
+          : res.status === 403
           ? 'Tài khoản này chưa được chia sẻ quyền xem Google Sheet.'
           : res.status === 404
             ? 'Không tìm thấy Google Sheet — kiểm tra lại link.'
             : `Lỗi Google API (${res.status}): ${detail}`
-  throw new GoogleApiError(res.status, message)
+  throw new GoogleApiError(res.status, message, res.status === 401 || /insufficient.*scope/i.test(detail))
 }
 
 export interface GoogleUser {

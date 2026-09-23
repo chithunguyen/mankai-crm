@@ -112,7 +112,7 @@ export function SheetProvider({ children }: { children: ReactNode }) {
       const { db, problems } = parseSheet(tabs)
       patch({ loading: false, title, problems, db: problems.length ? undefined : db, loadedAt: Date.now() })
     } catch (e) {
-      if (e instanceof GoogleApiError && e.status === 401) setSession(null)
+      if (e instanceof GoogleApiError && e.reauth) setSession(null)
       patch({ loading: false, error: (e as Error).message })
     }
   }, [])
