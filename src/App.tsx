@@ -2,6 +2,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router'
 import { Layout } from './components/layout/Layout'
 import { ToastProvider } from './components/ui/Toast'
 import { ModalProvider } from './modals/ModalProvider'
+import { SheetProvider } from './sheets/SheetProvider'
 import { AuditLogPage, PermissionsPage, SettingsPage } from './pages/Admin'
 import { DashboardPage } from './pages/Dashboard'
 import { FinancePage, TransactionsPage } from './pages/Finance'
@@ -14,6 +15,7 @@ import { ClassesPage, ProgressPage, ResultsPage } from './pages/Training'
 export default function App() {
   return (
     <HashRouter>
+      <SheetProvider>
       <ToastProvider>
         <ModalProvider>
           <Routes>
@@ -40,6 +42,7 @@ export default function App() {
           </Routes>
         </ModalProvider>
       </ToastProvider>
+      </SheetProvider>
     </HashRouter>
   )
 }

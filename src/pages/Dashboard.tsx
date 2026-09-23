@@ -1,16 +1,26 @@
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Badge, DataTable, Funnel, KpiGrid, PageHeader, SectionHead, StatusBadge, TaskList } from '../components/ui'
 import { useToast } from '../components/ui/Toast'
 import { useData } from '../hooks/useData'
 import { useModal } from '../modals/ModalProvider'
 import { api } from '../services/api'
+import { computeDashboard } from '../sheets/compute'
+import { SheetConnectPanel, SourceBar } from '../sheets/SheetPanels'
+import { useSheet } from '../sheets/SheetProvider'
+import type { Dashboard } from '../types'
 
 export function DashboardPage() {
-  const { data } = useData(api.getDashboard)
-  const navigate = useNavigate()
+  const sheet = useSheet()
+  const demo = useData(api.getDashboard)
+  const live = useMemo(() => (sheet.db ? computeDashboard(sheet.db, new Date(sheet.loadedAt ?? Date.now())) : undefined), [sheet.db, sheet.loadedAt])
+  const [configuring, setConfiguring] = useState(false)
   const toast = useToast()
   const openModal = useModal()
-  if (!data) return null
+
+  const isSheet = sheet.mode === 'sheet'
+  const data = isSheet ? live : demo.data
+  const showPanel = isSheet && (!live || configuring)
 
   return (
     <section>
@@ -24,6 +34,17 @@ export function DashboardPage() {
           </>
         }
       />
+      <SourceBar onConfigure={() => setConfiguring(true)} />
+      {showPanel && <SheetConnectPanel onDone={() => setConfiguring(false)} />}
+      {data && !showPanel && <DashboardView data={data} source={isSheet ? 'Google Sheet' : 'dữ liệu demo'} />}
+    </section>
+  )
+}
+
+function DashboardView({ data, source }: { data: Dashboard; source: string }) {
+  const navigate = useNavigate()
+  return (
+    <>
       <KpiGrid kpis={data.kpis} />
 
       <div className="dashboard-grid">
@@ -31,7 +52,7 @@ export function DashboardPage() {
           <div className="sect-head">
             <div>
               <div className="sect-title">Doanh thu & thu tiền</div>
-              <div className="subtitle">6 tháng gần nhất · dữ liệu demo</div>
+              <div className="subtitle">6 tháng gần nhất · {source}</div>
             </div>
             <div className="legend"><span><i />Doanh thu</span></div>
           </div>
@@ -76,7 +97,7 @@ export function DashboardPage() {
         <SectionHead title="Hoạt động gần đây" link="Xem Audit log →" onLink={() => navigate('/logs')} />
         <DataTable
           rows={data.activities}
-          rowKey={(r) => r.time + r.student}
+          rowKey={(r) => r.time + r.student + r.event}
           columns={[
             { header: 'Thời gian', render: (r) => r.time },
             { header: 'Học viên', render: (r) => r.student },
@@ -87,6 +108,6 @@ export function DashboardPage() {
           ]}
         />
       </div>
-    </section>
+    </>
   )
 }

@@ -5,6 +5,7 @@ import { navigation } from '../../config/navigation'
 import { useData } from '../../hooks/useData'
 import { useModal } from '../../modals/ModalProvider'
 import { api } from '../../services/api'
+import { useSheet } from '../../sheets/SheetProvider'
 import { normalize } from '../../utils/format'
 import { useToast } from '../ui/Toast'
 
@@ -81,6 +82,8 @@ export function Layout() {
   const toast = useToast()
   const openModal = useModal()
   const { pathname } = useLocation()
+  const { session } = useSheet()
+  const userName = session?.user?.name || 'Nguyễn Thu Chi'
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -99,9 +102,9 @@ export function Layout() {
             <button className="iconbtn" onClick={() => openModal('quick')} aria-label="Tạo nhanh">
               ＋
             </button>
-            <button className="profilebtn">
-              <span>Nguyễn Thu Chi</span>
-              <div className="avatar">C</div>
+            <button className="profilebtn" title={session?.user?.email}>
+              <span>{userName}</span>
+              <div className="avatar">{userName.split(' ').pop()?.[0]}</div>
             </button>
           </div>
         </header>
